@@ -1,4 +1,3 @@
-// app/register/page.tsx
 "use client";
 
 import * as React from "react";
@@ -31,6 +30,7 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { role: "student" },
+    shouldUnregister: true,
   });
 
   const role = watch("role");
