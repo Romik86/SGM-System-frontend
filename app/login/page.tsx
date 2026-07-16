@@ -12,8 +12,9 @@ import { Button } from "../_components/ui/button";
 import { Field, Input } from "../_components/ui/input";
 import { AlertBanner } from "../_components/ui/alert-banner";
 import { loginSchema, type LoginFormValues } from "../_validation/auth.validation";
-import { login } from "../_lib/auth.service";
-import { ApiError } from "../_lib/api-client";
+import { login } from "../_lib/auth";
+import { ApiError } from "../_lib/config";
+import { LoaderOverlay } from "../_components/ui/Miniloader";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -104,6 +105,8 @@ export default function LoginPage() {
           Sign in
         </Button>
       </form>
+
+      {isSubmitting && <LoaderOverlay message="Signing you in..." />}
     </AuthShell>
   );
 }

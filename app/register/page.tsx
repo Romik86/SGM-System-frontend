@@ -15,8 +15,9 @@ import {
   registerSchema,
   type RegisterFormValues,
 } from "../_validation/auth.validation";
-import { register as registerUser } from "../_lib/auth.service";
-import { ApiError } from "../_lib/api-client";
+import { register as registerUser } from "../_lib/auth";
+import { ApiError } from "../_lib/config";
+import { LoaderOverlay } from "../_components/ui/Miniloader";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -202,6 +203,8 @@ export default function RegisterPage() {
           Create account
         </Button>
       </form>
+
+      {isSubmitting && <LoaderOverlay message="Creating your account..." />}
     </AuthShell>
   );
 }

@@ -1,7 +1,7 @@
-// app/_lib/api-client.ts
+// app/_lib/api-client.ts4
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://172.16.4.250:8000"
+export const BASE_URL = (
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://sgm-system.onrender.com"
 ).replace(/\/+$/, ""); // strip trailing slash(es) so paths never double up
 
 export class ApiError extends Error {
@@ -43,7 +43,7 @@ export async function apiFetch<T>(
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${BASE_URL}${path}`, {
     ...rest,
     headers: finalHeaders,
     body: body !== undefined ? JSON.stringify(body) : undefined,

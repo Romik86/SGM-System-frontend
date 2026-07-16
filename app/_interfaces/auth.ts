@@ -1,6 +1,6 @@
 // app/_interfaces/auth.interface.ts
 
-export type UserRole = "teacher" | "student";
+export type Role = "teacher" | "student";
 
 /** POST /accounts/login/ — request body */
 export interface LoginPayload {
@@ -13,7 +13,7 @@ export interface LoginResponse {
   message: string;
   email: string;
   full_name: string;
-  role: UserRole;
+  role: Role;
   user_id: string;
   refresh: string;
   access: string;
@@ -25,7 +25,7 @@ export interface RegisterPayload {
   first_name: string;
   last_name: string;
   phone_number: string;
-  role: UserRole;
+  role: Role;
   student_id?: string;
   enrollment_year?: number;
   profile_image?: string;
@@ -39,7 +39,7 @@ export interface RegisterResponse {
     id: string;
     email: string;
     full_name: string;
-    role: UserRole;
+    role: Role;
   };
 }
 
@@ -48,4 +48,19 @@ export interface ApiErrorResponse {
   detail?: string;
   message?: string;
   [field: string]: string | string[] | undefined;
+}
+
+
+export interface StoredUser {
+  id?: string | number;
+  email?: string;
+  full_name: string;
+  role: Role;
+  // Populated once a student joins a batch — either from the login/register
+  // response directly, or set locally right after a successful join.
+  batch_id?: string | number | null;
+  class_code?: string | null;
+  token?: string;
+  access_token?: string;
+  [key: string]: unknown;
 }
