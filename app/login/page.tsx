@@ -11,11 +11,14 @@ import { AuthShell } from "../_components/auth-shell";
 import { Button } from "../_components/ui/button";
 import { Field, Input } from "../_components/ui/input";
 import { AlertBanner } from "../_components/ui/alert-banner";
-import { loginSchema, type LoginFormValues } from "../_validation/auth.validation";
+import {
+  loginSchema,
+  type LoginFormValues,
+} from "../_validation/auth.validation";
 import { login } from "../_lib/auth";
 import { ApiError } from "../_lib/config";
 import { LoaderOverlay } from "../_components/ui/Miniloader";
-
+import { getFriendlyAuthError } from "../_lib/error-messages";
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = React.useState("");
@@ -34,11 +37,7 @@ export default function LoginPage() {
       const data = await login(values);
       router.push(data.role === "teacher" ? "/dashboard" : "/dashboard");
     } catch (err) {
-      if (err instanceof ApiError) {
-        setServerError(err.message);
-      } else {
-        setServerError("Something went wrong. Please try again.");
-      }
+      setServerError(getFriendlyAuthError(err, "login"));
     }
   };
 

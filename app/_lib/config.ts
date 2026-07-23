@@ -55,11 +55,41 @@ export async function apiFetch<T>(
   const data = isJson ? await response.json() : null;
 
   if (!response.ok) {
-    const message =
-      (data && (data.message || data.detail)) ||
-      "Something went wrong. Please try again.";
+    const message = extractErrorMessage(data);
     throw new ApiError(message, response.status, data);
   }
 
   return data as T;
+}
+
+/**
+ * DRF error payloads come in several shapes:
+ *  - { detail: "..." }
+ *  - { message: "..." }
+ *  - { non_field_errors: ["..."] }
+ *  - { email: ["user with this email already exists."] }  <-- field errors
+ */
+function extractErrorMessage(data: unknown): string {
+  if (!data || typeof data !== "object") {
+    return "Something went wrong. Please try again.";
+  }
+  const obj = data as Record<string, unknown>;
+
+  if (typeof obj.message === "string") return obj.message;
+  if (typeof obj.detail === "string") return obj.detail;
+
+  if (Array.isArray(obj.non_field_errors) && obj.non_field_errors.length) {
+    return String(obj.non_field_errors[0]);
+  }
+
+  for (const value of Object.values(obj)) {
+    if (Array.isArray(value) && value.length && typeof value[0] === "string") {
+      return value[0];
+    }
+    if (typeof value === "string") {
+      return value;
+    }
+  }
+
+  return "Something went wrong. Please try again.";
 }

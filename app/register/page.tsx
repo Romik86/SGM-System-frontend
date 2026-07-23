@@ -18,7 +18,7 @@ import {
 import { register as registerUser } from "../_lib/auth";
 import { ApiError } from "../_lib/config";
 import { LoaderOverlay } from "../_components/ui/Miniloader";
-
+import { getFriendlyAuthError } from "../_lib/error-messages";
 export default function RegisterPage() {
   const router = useRouter();
   const [serverError, setServerError] = React.useState("");
@@ -43,11 +43,7 @@ export default function RegisterPage() {
       await registerUser(payload);
       router.push("/login?registered=1");
     } catch (err) {
-      if (err instanceof ApiError) {
-        setServerError(err.message);
-      } else {
-        setServerError("Something went wrong. Please try again.");
-      }
+      setServerError(getFriendlyAuthError(err, "register"));
     }
   };
 
