@@ -155,16 +155,14 @@ export function Sidebar({
                         href={item.href}
                         onClick={onNavigate}
                         aria-current={active ? "page" : undefined}
-                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
-                            active
-                                ? "bg-[var(--accent)]/10 text-[var(--accent)]"
-                                : "text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text)]"
-                        }`}
+                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${active
+                            ? "bg-[var(--accent)]/10 text-[var(--accent)]"
+                            : "text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text)]"
+                            }`}
                     >
                         <Icon
-                            className={`h-5 w-5 shrink-0 transition-colors ${
-                                active ? "text-[var(--accent)]" : "text-[var(--text-muted)] group-hover:text-[var(--text)]"
-                            }`}
+                            className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-[var(--accent)]" : "text-[var(--text-muted)] group-hover:text-[var(--text)]"
+                                }`}
                         />
                         {item.label}
                     </Link>
