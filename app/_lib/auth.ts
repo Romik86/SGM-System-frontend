@@ -52,7 +52,7 @@ export function logout() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem("access_token");
   window.localStorage.removeItem("refresh_token");
-  window.localStorage.removeItem("user");
+  window.localStorage.removeItem(USER_KEY);
 }
 
 const USER_KEY = "eduportal_user";
