@@ -3,7 +3,7 @@ import { BASE_URL } from "./config";
 import type { Subject } from "@/app/_interfaces/subject";
 
 export async function getMySubjectsClient(): Promise<Subject[]> {
-  const res = await fetchWithAuth(`${BASE_URL}/system/subjects/my-subjects/`, {
+  const res = await fetchWithAuth(`${BASE_URL}/system/student/subjects/my-subjects/`, {
     method: "GET",
   });
 

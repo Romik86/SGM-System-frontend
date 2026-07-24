@@ -3,7 +3,7 @@ import { BASE_URL } from "./config";
 import type { MyClass, MyClassesResponse } from "@/app/_interfaces/class";
 
 export async function joinClass(classCode: string): Promise<void> {
-  const res = await fetchWithAuth(`${BASE_URL}/system/classes/join/`, {
+  const res = await fetchWithAuth(`${BASE_URL}/system/student/classes/join/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ class_code: classCode }),
@@ -22,7 +22,7 @@ export async function joinClass(classCode: string): Promise<void> {
 }
 
 export async function getMyClassesClient(): Promise<MyClass[]> {
-  const res = await fetchWithAuth(`${BASE_URL}/system/classes/my-classes/`, {
+  const res = await fetchWithAuth(`${BASE_URL}/system/student/classes/my-classes/`, {
     method: "GET",
   });
 
