@@ -1,3 +1,9 @@
+export interface Subject {
+    id: string;
+    code: string;
+    name: string;
+}
+
 export interface ClassDetails {
     id: string;
     name: string;
@@ -5,6 +11,7 @@ export interface ClassDetails {
     batch_name: string;
     academic_year: string;
     class_code: string;
+    subjects: Subject[];
 }
 
 export interface MyClass {
