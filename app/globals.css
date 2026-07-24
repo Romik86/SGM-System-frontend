@@ -24,6 +24,9 @@
 
   --gold: #b3891f;
   --red-pen: #c1443c;
+
+  --gradient-a: rgb(238, 233, 233);
+  --gradient-b: rgba(180, 200, 174, 0.679);
 }
 
 .dark {
@@ -44,17 +47,27 @@
 
   --gold: #d9b545;
   --red-pen: #e2726b;
+
+  --gradient-a: rgba(166, 135, 40, 0.1);
+  --gradient-b: rgba(134, 180, 156, 0.386);
 }
 
 html {
   color-scheme: light;
+  background: var(--bg);
 }
 html.dark {
   color-scheme: dark;
+  background: var(--bg);
 }
 
 body {
-  background: var(--bg);
+  min-height: 100vh;
   color: var(--text);
   font-family: var(--font-sans);
+  background:
+    radial-gradient(ellipse 90% 60% at 15% 0%, var(--gradient-a), transparent 70%),
+    radial-gradient(ellipse 80% 55% at 100% 10%, var(--gradient-b), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
 }
