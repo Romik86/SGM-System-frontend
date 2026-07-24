@@ -31,13 +31,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/dashboard", icon: IconOverview },
   { label: "Classes", href: "/dashboard/classes", icon: IconClasses },
   {
-    label: "My Subjects",
-    href: "/dashboard/subjects",
-    roles: ["student"],
-    icon: IconSubjects,
-  },
-  { label: "Grades", href: "/dashboard/grades", icon: IconGrades },
-  {
     label: "Attendance",
     href: "/dashboard/attendance",
     roles: ["teacher"],
@@ -136,10 +129,10 @@ export function Sidebar({
     <div className="flex items-center justify-between px-4 py-5">
       <div className="flex items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#C69A44]/60 text-[#D9C48A]">
-          <span className="font-serif text-sm font-bold">E</span>
+          <span className="font-serif text-sm font-bold">G</span>
         </div>
         <span className="font-serif text-lg font-bold text-[#F5F1E7]">
-          EduPortal
+          GRADEBOOK
         </span>
       </div>
 
@@ -186,18 +179,16 @@ export function Sidebar({
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#C69A44] ${
-              active
-                ? "bg-[#C69A44]/15 text-[#D9C48A]"
-                : "text-[#C7CEC8] hover:bg-white/10 hover:text-[#F5F1E7]"
-            }`}
+            className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#C69A44] ${active
+              ? "bg-[#C69A44]/15 text-[#D9C48A]"
+              : "text-[#C7CEC8] hover:bg-white/10 hover:text-[#F5F1E7]"
+              }`}
           >
             <Icon
-              className={`h-5 w-5 shrink-0 transition-colors ${
-                active
-                  ? "text-[#D9C48A]"
-                  : "text-[#C7CEC8]/80 group-hover:text-[#F5F1E7]"
-              }`}
+              className={`h-5 w-5 shrink-0 transition-colors ${active
+                ? "text-[#D9C48A]"
+                : "text-[#C7CEC8]/80 group-hover:text-[#F5F1E7]"
+                }`}
             />
             {item.label}
             {active && (

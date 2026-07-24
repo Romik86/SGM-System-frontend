@@ -1,6 +1,6 @@
 import { fetchWithAuth } from "./auth";
 import { BASE_URL } from "./config";
-import type { MyClass, MyClassesResponse } from "@/app/_interfaces/class";
+import type { MyClass, MyClassesResponse } from "@/app/_interfaces/classes";
 
 export async function joinClass(classCode: string): Promise<void> {
   const res = await fetchWithAuth(`${BASE_URL}/system/student/classes/join/`, {
@@ -33,3 +33,4 @@ export async function getMyClassesClient(): Promise<MyClass[]> {
   const data: MyClassesResponse = await res.json();
   return Array.isArray(data?.my_classes) ? data.my_classes : [];
 }
+

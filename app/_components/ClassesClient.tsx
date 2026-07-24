@@ -5,8 +5,9 @@ import { getMyClassesClient } from "@/app/_lib/classes";
 import { getStoredUser } from "@/app/_lib/auth";
 import { JoinClassForm } from "./JoinClassForm";
 import { IconClasses } from "./ui/icons";
-import type { MyClass } from "@/app/_interfaces/class";
+import type { MyClass } from "@/app/_interfaces/classes";
 import type { StoredUser } from "@/app/_interfaces/auth";
+import Link from "next/link";
 
 export default function ClassesClient() {
   const [user, setUser] = React.useState<StoredUser | null>(null);
@@ -150,8 +151,9 @@ export default function ClassesClient() {
             {classes.map((item) => {
               const details = item.class_details;
               return (
-                <div
+                <Link
                   key={item.id}
+                  href={`/dashboard/classes/${details.id}`}
                   className="group relative flex h-full flex-col justify-between rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--accent)]/40 hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]"
                 >
                   <div>
@@ -173,13 +175,17 @@ export default function ClassesClient() {
                   </div>
 
                   <button
-                    onClick={() => handleCopyCode(details.class_code, item.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCopyCode(details.class_code, item.id);
+                    }}
                     title="Copy class code"
                     className="mt-4 self-start rounded-full border border-[var(--line)] bg-[var(--bg)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] transition-colors hover:border-[var(--gold)]/50 hover:text-[var(--gold)]"
                   >
                     {copiedId === item.id ? "Copied!" : details.class_code}
                   </button>
-                </div>
+                </Link>
               );
             })}
           </div>
