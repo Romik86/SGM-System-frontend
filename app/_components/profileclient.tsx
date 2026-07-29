@@ -60,15 +60,11 @@ export default function ProfileClient() {
     setServerError("");
     setSuccess(false);
     try {
-      const updated = await updateMyProfileClient(
-        isTeacher
-          ? {
-              first_name: values.first_name,
-              last_name: values.last_name,
-              phone_number: values.phone_number,
-            }
-          : { phone_number: values.phone_number }
-      );
+      const updated = await updateMyProfileClient({
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone_number: values.phone_number,
+      });
       setProfile(updated);
       reset({
         first_name: updated.first_name ?? "",
@@ -90,9 +86,7 @@ export default function ProfileClient() {
         My Profile
       </h1>
       <p className="mt-1.5 text-sm text-[var(--text-muted)]">
-        {isTeacher
-          ? "Update your name and phone number. Email and role are managed by the school."
-          : "Your account details. Name, email, and role are managed by the school and can't be edited here."}
+        Update your name and phone number. Email and role are managed by the school.
       </p>
 
       {loadError && (
@@ -191,9 +185,7 @@ export default function ProfileClient() {
               <div>
                 <p className="text-sm font-semibold text-[var(--text)]">Editable details</p>
                 <p className="text-xs text-[var(--text-muted)]">
-                  {isTeacher
-                    ? "Name and phone number can be updated here."
-                    : "Only phone number can be updated here."}
+                  Name and phone number can be updated here.
                 </p>
               </div>
             </div>
@@ -210,26 +202,24 @@ export default function ProfileClient() {
                 </div>
               )}
 
-              {isTeacher && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="First name" htmlFor="first_name" error={errors.first_name?.message}>
-                    <Input
-                      id="first_name"
-                      autoComplete="given-name"
-                      error={!!errors.first_name}
-                      {...register("first_name")}
-                    />
-                  </Field>
-                  <Field label="Last name" htmlFor="last_name" error={errors.last_name?.message}>
-                    <Input
-                      id="last_name"
-                      autoComplete="family-name"
-                      error={!!errors.last_name}
-                      {...register("last_name")}
-                    />
-                  </Field>
-                </div>
-              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Field label="First name" htmlFor="first_name" error={errors.first_name?.message}>
+                  <Input
+                    id="first_name"
+                    autoComplete="given-name"
+                    error={!!errors.first_name}
+                    {...register("first_name")}
+                  />
+                </Field>
+                <Field label="Last name" htmlFor="last_name" error={errors.last_name?.message}>
+                  <Input
+                    id="last_name"
+                    autoComplete="family-name"
+                    error={!!errors.last_name}
+                    {...register("last_name")}
+                  />
+                </Field>
+              </div>
 
               <Field label="Phone number" htmlFor="phone_number" error={errors.phone_number?.message}>
                 <Input
