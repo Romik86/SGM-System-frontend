@@ -29,7 +29,13 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/dashboard", icon: IconOverview },
-  { label: "Classes", href: "/dashboard/classes", icon: IconClasses },
+  // Students join classes via /accounts/classes/join — teachers don't have
+  // an equivalent "classes" endpoint, so this stays student-only.
+  { label: "Classes", href: "/dashboard/classes", roles: ["student"], icon: IconClasses },
+  // Teacher's grading workflow — GET /system/teachers/my-subjects/ already
+  // embeds class_name/section/batch_name, so a separate "classes" view
+  // isn't needed on this side.
+  { label: "My Subjects", href: "/dashboard/subjects", roles: ["teacher"], icon: IconSubjects },
   {
     label: "Attendance",
     href: "/dashboard/attendance",
