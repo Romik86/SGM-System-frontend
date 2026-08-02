@@ -34,8 +34,8 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError("");
     try {
-      const data = await login(values);
-      router.push(data.role === "teacher" ? "/dashboard" : "/dashboard");
+      await login(values);
+      router.push("/dashboard");
     } catch (err) {
       setServerError(getFriendlyAuthError(err, "login"));
     }

@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     return (
-        <div className="flex min-h-screen bg-[var(--background)]">
+        <div className="flex min-h-screen">
             <Sidebar
                 role={user.role}
                 theme={theme}

@@ -1,6 +1,7 @@
 // app/_lib/auth.service.ts
 import { apiFetch } from "./config";
 import type { StoredUser } from "@/app/_interfaces/auth";
+import { ROLE_MAP } from "@/app/_interfaces/auth";
 
 import type {
   LoginPayload,
@@ -42,7 +43,14 @@ function persistSession(data: LoginResponse) {
     id: data.user_id,
     email: data.email,
     full_name: data.full_name,
-    role: data.role,
+    role: ROLE_MAP[data.role] ?? "student",
+    access_token: data.access,
+    token: data.access,
+  });storeUser({
+    id: data.user_id,
+    email: data.email,
+    full_name: data.full_name,
+    role: ROLE_MAP[data.role] ?? "student",
     access_token: data.access,
     token: data.access,
   });

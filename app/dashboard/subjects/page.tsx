@@ -1,9 +1,9 @@
-import SubjectsClient from "@/app/_components/SubjectsClient";
+import TeacherSubjectsClient from "@/app/_components/TeacherSubjectsClient";
 
 export const metadata = {
-    title: "My Subjects",
+  title: "My Subjects",
 };
 
-export default function SubjectsPage() {
-    return <SubjectsClient />;
+export default function TeacherSubjectsPage() {
+  return <TeacherSubjectsClient />;
 }

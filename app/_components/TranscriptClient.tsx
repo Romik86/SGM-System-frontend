@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { getMyTranscriptClient } from "@/app/_lib/transcript";
+import { getClassTranscriptClient } from "@/app/_lib/transcript";
+import { useParams } from "next/navigation";
 import { getStoredUser } from "@/app/_lib/auth";
-import type { Transcript, TranscriptSubject } from "@/app/_interfaces/transcript";
+import type { ClassTranscript, ClassTranscriptSubject } from "@/app/_interfaces/transcript";
 import type { StoredUser } from "@/app/_interfaces/auth";
-
-/**
- * The "grade-stamp" seal — same rotated-circle-of-ink idiom already used on
- * the auth screen (see auth-shell.tsx: the gold "A+ / Verified" seal). Here
- * it does real work: it's the one visual the whole page is built around.
- */
+import { downloadTranscriptPdf } from "@/app/_lib/transcriptPdf";
+import { getLetterGrade, getOverallPercentage } from "@/app/_lib/grading";
 function GradeSeal({
     size = "lg",
     tone,
@@ -49,14 +46,16 @@ function GradeSeal({
     );
 }
 
-function subjectTone(subject: TranscriptSubject): "gold" | "red" | "muted" {
+function subjectTone(subject: ClassTranscriptSubject): "gold" | "red" | "muted" {
     if (subject.is_passed === null) return "muted";
     return subject.is_passed ? "gold" : "red";
 }
 
 export default function TranscriptClient() {
     const [user, setUser] = React.useState<StoredUser | null>(null);
-    const [transcript, setTranscript] = React.useState<Transcript | null>(null);
+    const [transcript, setTranscript] = React.useState<ClassTranscript | null>(null);
+    const params = useParams();
+    const classId = params.classId as string;
     const [error, setError] = React.useState<string | null>(null);
 
     React.useEffect(() => {
@@ -68,8 +67,19 @@ export default function TranscriptClient() {
         let cancelled = false;
         (async () => {
             try {
-                const data = await getMyTranscriptClient();
-                if (!cancelled) setTranscript(data);
+                const data = await getClassTranscriptClient(classId);
+
+                console.log("Transcript API Response:", data);
+
+                if (!cancelled) {
+                    setTranscript(data);
+                }
+
+
+
+                if (!cancelled) {
+                    setTranscript(data);
+                }
             } catch (err) {
                 if (!cancelled) {
                     setError(err instanceof Error ? err.message : "Failed to load transcript.");
@@ -98,29 +108,46 @@ export default function TranscriptClient() {
         );
     }
 
-    const status = transcript?.summary.overall_status ?? "";
+    const status = transcript?.summary?.overall_status ?? "";
     const isPending = status.toLowerCase() === "pending";
     const isFail = status.toLowerCase().includes("fail");
     const overallTone: "gold" | "red" = isFail ? "red" : "gold";
 
     const percentage =
         transcript && transcript.summary.total_full_marks > 0
-            ? (transcript.summary.total_obtained_marks / transcript.summary.total_full_marks) * 100
+            ? getOverallPercentage(transcript.summary.total_obtained_marks, transcript.summary.total_full_marks)
             : null;
+
+    const overallGrade = percentage !== null ? getLetterGrade(percentage) : null;
 
     return (
         <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]">
-                {transcript ? `Transcript \u00b7 ${transcript.class_info.name}` : "Transcript"}
-            </p>
-            <h1 className="mt-2 font-serif text-2xl font-semibold text-[var(--text)]">
-                My Transcript
-            </h1>
-            <p className="mt-1.5 text-sm text-[var(--text-muted)]">
-                {transcript
-                    ? `Section ${transcript.class_info.section} \u00b7 ${transcript.class_info.batch} \u00b7 ${transcript.class_info.academic_year}`
-                    : "Your grades for the current class."}
-            </p>
+            <div className="flex items-start justify-between">
+                <div>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]">
+                        {transcript ? `Transcript · ${transcript.class_info.program}` : "Transcript"}
+                    </p>
+
+                    <h1 className="mt-2 font-serif text-2xl font-semibold text-[var(--text)]">
+                        My Transcript
+                    </h1>
+
+                    <p className="mt-1.5 text-sm text-[var(--text-muted)]">
+                        {transcript
+                            ? `Section ${transcript.class_info.section} · ${transcript.class_info.batch} · ${transcript.class_info.academic_year}`
+                            : "Your grades for the current class."}
+                    </p>
+                </div>
+
+                {transcript && !isPending && (
+                    <button
+                        onClick={() => downloadTranscriptPdf(transcript)}
+                        className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+                    >
+                        Download PDF
+                    </button>
+                )}
+            </div>
 
             <div className="mt-8 space-y-8">
                 {error && (
@@ -148,7 +175,7 @@ export default function TranscriptClient() {
                                 Your transcript isn&apos;t stamped yet
                             </div>
                             <p className="mt-1.5 text-sm text-[var(--text-muted)]">
-                                Grades for {transcript.class_info.name} are still being finalized. Check back
+                                Grades for {transcript.class_info.program} are still being finalized. Check back
                                 once your teacher has published the results.
                             </p>
                         </div>
@@ -176,6 +203,24 @@ export default function TranscriptClient() {
                                         {" "}
                                         / {transcript.summary.total_full_marks}
                                     </span>
+                                </div>
+                                <div className="mt-3 flex justify-center gap-6 sm:justify-start">
+                                    <div>
+                                        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                            Overall %
+                                        </div>
+                                        <div className="mt-0.5 text-sm font-semibold text-[var(--text)]">
+                                            {percentage !== null ? `${percentage.toFixed(1)}%` : "—"}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                            Overall Grade
+                                        </div>
+                                        <div className="mt-0.5 text-sm font-semibold text-[var(--text)]">
+                                            {overallGrade ?? "—"}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div
                                     className="mt-3 mx-auto h-px w-full max-w-xs bg-[repeating-linear-gradient(90deg,var(--line)_0,var(--line)_6px,transparent_6px,transparent_10px)] sm:mx-0"
@@ -223,34 +268,23 @@ export default function TranscriptClient() {
 
                             <div className="divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-5">
                                 {transcript.subjects.map((subject) => (
-                                    <div
-                                        key={subject.subject_code}
-                                        className="flex items-center justify-between gap-4 py-4"
-                                    >
-                                        <div className="min-w-0">
-                                            <div className="truncate text-sm font-medium text-[var(--text)]">
-                                                {subject.subject_name}
-                                            </div>
-                                            <div className="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-[var(--text-muted)]">
-                                                {subject.subject_code}
-                                            </div>
-                                        </div>
+                                    <div key={subject.subject_code} className="py-5">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="truncate text-base font-semibold text-[var(--text)]">
+                                                    {subject.subject_name}
+                                                </div>
 
-                                        <div className="flex shrink-0 items-center gap-4">
-                                            <div className="text-right font-mono text-sm tabular-nums text-[var(--text)]">
-                                                {subject.obtained_marks === null ? (
-                                                    <span className="text-[var(--text-muted)]">&mdash;</span>
-                                                ) : (
-                                                    subject.obtained_marks
-                                                )}
-                                                <span className="text-[var(--text-muted)]"> / {subject.full_marks}</span>
+                                                <div className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[var(--text-muted)]">
+                                                    {subject.subject_code}
+                                                </div>
                                             </div>
 
                                             <GradeSeal
                                                 size="sm"
                                                 tone={subjectTone(subject)}
                                                 dashed={subject.is_passed === null}
-                                                big={subject.letter_grade}
+                                                big={subject.final_letter_grade}
                                                 small={
                                                     subject.is_passed === null
                                                         ? ""
@@ -259,6 +293,65 @@ export default function TranscriptClient() {
                                                             : "Fail"
                                                 }
                                             />
+                                        </div>
+
+                                        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                            {subject.exam_breakdown.map((exam) => (
+                                                <div
+                                                    key={exam.exam_type}
+                                                    className="rounded-xl border border-[var(--line)] bg-[var(--bg)] p-3"
+                                                >
+                                                    <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                        {exam.exam_type}
+                                                    </div>
+
+                                                    <div className="mt-2 text-lg font-semibold text-[var(--text)]">
+                                                        {exam.obtained_marks}
+                                                        <span className="text-sm font-normal text-[var(--text-muted)]">
+                                                            {" "}
+                                                            / {exam.full_marks}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="mt-1 text-sm text-[var(--text-muted)]">
+                                                        {exam.percentage.toFixed(1)}%
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-4 flex flex-wrap items-center gap-6 border-t border-[var(--line)] pt-4">
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Final Percentage
+                                                </div>
+                                                <div className="mt-1 text-lg font-semibold text-[var(--text)]">
+                                                    {subject.final_percentage ?? "--"}%
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Final Grade
+                                                </div>
+                                                <div className="mt-1 text-lg font-semibold text-[var(--text)]">
+                                                    {subject.final_letter_grade}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Result
+                                                </div>
+                                                <div
+                                                    className={`mt-1 text-lg font-semibold ${subject.is_passed
+                                                            ? "text-green-600"
+                                                            : "text-red-600"
+                                                        }`}
+                                                >
+                                                    {subject.is_passed ? "PASS" : "FAIL"}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
