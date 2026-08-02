@@ -73,7 +73,7 @@ export default function ClassTranscriptClient({ classId }: { classId: string }) 
         <div>
             <div className="flex items-center justify-between">
                 <Link
-                    href={`/dashboard/classes/${classId}`}
+                    href={"/dashboard/classes"}
                     className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--accent)]"
                 >
                     &larr; Class Details
