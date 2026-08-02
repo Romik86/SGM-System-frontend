@@ -43,14 +43,14 @@ const ROLE_COPY: Record<
     sub: "Track your grades, assignments, and attendance.",
     links: [
       {
-        href: "/dashboard/subjects",
-        label: "My Subjects",
+        href: "/dashboard/classes",
+        label: "My Classes",
         desc: "See your enrolled subjects",
       },
       {
-        href: "/dashboard/grades",
-        label: "Grades",
-        desc: "Check your latest marks",
+        href: "/dashboard/profile",
+        label: "Profile",
+        desc: "Check your Profile",
       },
       {
         href: "/dashboard/assignments",

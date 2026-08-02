@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { getClassTranscriptClient } from "@/app/_lib/transcript";
+import { getLetterGrade, getOverallPercentage } from "@/app/_lib/grading";
 import type { ClassTranscript, ClassTranscriptSubject } from "@/app/_interfaces/transcript";
 
 function GradeSeal({
@@ -63,6 +64,11 @@ export default function ClassTranscriptClient({ classId }: { classId: string }) 
         };
     }, [classId]);
 
+    const overallPercentage = transcript
+        ? getOverallPercentage(transcript.summary.total_obtained_marks, transcript.summary.total_full_marks)
+        : null;
+    const overallGrade = overallPercentage !== null ? getLetterGrade(overallPercentage) : null;
+
     return (
         <div>
             <div className="flex items-center justify-between">
@@ -105,7 +111,7 @@ export default function ClassTranscriptClient({ classId }: { classId: string }) 
                         {transcript.class_info.academic_year}
                     </p>
 
-                    <div className="mt-5 flex items-center gap-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
+                    <div className="mt-5 flex flex-wrap items-center gap-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
                         <div>
                             <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
                                 Total marks
@@ -115,6 +121,22 @@ export default function ClassTranscriptClient({ classId }: { classId: string }) 
                                 <span className="text-base font-normal text-[var(--text-muted)]">
                                     {" "}/ {transcript.summary.total_full_marks}
                                 </span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                Overall %
+                            </div>
+                            <div className="mt-1 font-serif text-2xl font-semibold text-[var(--text)]">
+                                {overallPercentage !== null ? `${overallPercentage}%` : "—"}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                Overall Grade
+                            </div>
+                            <div className="mt-1 font-serif text-2xl font-semibold text-[var(--text)]">
+                                {overallGrade ?? "—"}
                             </div>
                         </div>
                         <div className="ml-auto text-right">

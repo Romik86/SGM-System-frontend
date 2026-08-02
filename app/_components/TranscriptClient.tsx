@@ -7,6 +7,7 @@ import { getStoredUser } from "@/app/_lib/auth";
 import type { ClassTranscript, ClassTranscriptSubject } from "@/app/_interfaces/transcript";
 import type { StoredUser } from "@/app/_interfaces/auth";
 import { downloadTranscriptPdf } from "@/app/_lib/transcriptPdf";
+import { getLetterGrade, getOverallPercentage } from "@/app/_lib/grading";
 function GradeSeal({
     size = "lg",
     tone,
@@ -114,8 +115,10 @@ export default function TranscriptClient() {
 
     const percentage =
         transcript && transcript.summary.total_full_marks > 0
-            ? (transcript.summary.total_obtained_marks / transcript.summary.total_full_marks) * 100
+            ? getOverallPercentage(transcript.summary.total_obtained_marks, transcript.summary.total_full_marks)
             : null;
+
+    const overallGrade = percentage !== null ? getLetterGrade(percentage) : null;
 
     return (
         <div>
@@ -201,6 +204,24 @@ export default function TranscriptClient() {
                                         / {transcript.summary.total_full_marks}
                                     </span>
                                 </div>
+                                <div className="mt-3 flex justify-center gap-6 sm:justify-start">
+                                    <div>
+                                        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                            Overall %
+                                        </div>
+                                        <div className="mt-0.5 text-sm font-semibold text-[var(--text)]">
+                                            {percentage !== null ? `${percentage.toFixed(1)}%` : "—"}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                            Overall Grade
+                                        </div>
+                                        <div className="mt-0.5 text-sm font-semibold text-[var(--text)]">
+                                            {overallGrade ?? "—"}
+                                        </div>
+                                    </div>
+                                </div>
                                 <div
                                     className="mt-3 mx-auto h-px w-full max-w-xs bg-[repeating-linear-gradient(90deg,var(--line)_0,var(--line)_6px,transparent_6px,transparent_10px)] sm:mx-0"
                                     aria-hidden
@@ -246,96 +267,95 @@ export default function TranscriptClient() {
                             </div>
 
                             <div className="divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-5">
-    {transcript.subjects.map((subject) => (
-        <div key={subject.subject_code} className="py-5">
-            <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                    <div className="truncate text-base font-semibold text-[var(--text)]">
-                        {subject.subject_name}
-                    </div>
+                                {transcript.subjects.map((subject) => (
+                                    <div key={subject.subject_code} className="py-5">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="truncate text-base font-semibold text-[var(--text)]">
+                                                    {subject.subject_name}
+                                                </div>
 
-                    <div className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[var(--text-muted)]">
-                        {subject.subject_code}
-                    </div>
-                </div>
+                                                <div className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[var(--text-muted)]">
+                                                    {subject.subject_code}
+                                                </div>
+                                            </div>
 
-                <GradeSeal
-                    size="sm"
-                    tone={subjectTone(subject)}
-                    dashed={subject.is_passed === null}
-                    big={subject.final_letter_grade}
-                    small={
-                        subject.is_passed === null
-                            ? ""
-                            : subject.is_passed
-                                ? "Pass"
-                                : "Fail"
-                    }
-                />
-            </div>
+                                            <GradeSeal
+                                                size="sm"
+                                                tone={subjectTone(subject)}
+                                                dashed={subject.is_passed === null}
+                                                big={subject.final_letter_grade}
+                                                small={
+                                                    subject.is_passed === null
+                                                        ? ""
+                                                        : subject.is_passed
+                                                            ? "Pass"
+                                                            : "Fail"
+                                                }
+                                            />
+                                        </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                {subject.exam_breakdown.map((exam) => (
-                    <div
-                        key={exam.exam_type}
-                        className="rounded-xl border border-[var(--line)] bg-[var(--bg)] p-3"
-                    >
-                        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                            {exam.exam_type}
-                        </div>
+                                        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                            {subject.exam_breakdown.map((exam) => (
+                                                <div
+                                                    key={exam.exam_type}
+                                                    className="rounded-xl border border-[var(--line)] bg-[var(--bg)] p-3"
+                                                >
+                                                    <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                        {exam.exam_type}
+                                                    </div>
 
-                        <div className="mt-2 text-lg font-semibold text-[var(--text)]">
-                            {exam.obtained_marks}
-                            <span className="text-sm font-normal text-[var(--text-muted)]">
-                                {" "}
-                                / {exam.full_marks}
-                            </span>
-                        </div>
+                                                    <div className="mt-2 text-lg font-semibold text-[var(--text)]">
+                                                        {exam.obtained_marks}
+                                                        <span className="text-sm font-normal text-[var(--text-muted)]">
+                                                            {" "}
+                                                            / {exam.full_marks}
+                                                        </span>
+                                                    </div>
 
-                        <div className="mt-1 text-sm text-[var(--text-muted)]">
-                            {exam.percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                ))}
-            </div>
+                                                    <div className="mt-1 text-sm text-[var(--text-muted)]">
+                                                        {exam.percentage.toFixed(1)}%
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-6 border-t border-[var(--line)] pt-4">
-                <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                        Final Percentage
-                    </div>
-                    <div className="mt-1 text-lg font-semibold text-[var(--text)]">
-                        {subject.final_percentage ?? "--"}%
-                    </div>
-                </div>
+                                        <div className="mt-4 flex flex-wrap items-center gap-6 border-t border-[var(--line)] pt-4">
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Final Percentage
+                                                </div>
+                                                <div className="mt-1 text-lg font-semibold text-[var(--text)]">
+                                                    {subject.final_percentage ?? "--"}%
+                                                </div>
+                                            </div>
 
-                <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                        Final Grade
-                    </div>
-                    <div className="mt-1 text-lg font-semibold text-[var(--text)]">
-                        {subject.final_letter_grade}
-                    </div>
-                </div>
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Final Grade
+                                                </div>
+                                                <div className="mt-1 text-lg font-semibold text-[var(--text)]">
+                                                    {subject.final_letter_grade}
+                                                </div>
+                                            </div>
 
-                <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                        Result
-                    </div>
-                    <div
-                        className={`mt-1 text-lg font-semibold ${
-                            subject.is_passed
-                                ? "text-green-600"
-                                : "text-red-600"
-                        }`}
-                    >
-                        {subject.is_passed ? "PASS" : "FAIL"}
-                    </div>
-                </div>
-            </div>
-        </div>
-    ))}
-</div>
+                                            <div>
+                                                <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+                                                    Result
+                                                </div>
+                                                <div
+                                                    className={`mt-1 text-lg font-semibold ${subject.is_passed
+                                                            ? "text-green-600"
+                                                            : "text-red-600"
+                                                        }`}
+                                                >
+                                                    {subject.is_passed ? "PASS" : "FAIL"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </>
                 )}

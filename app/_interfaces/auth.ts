@@ -2,6 +2,15 @@
 
 export type Role = "teacher" | "student";
 
+// Backend now returns role as an integer enum (see accounts/models.py):
+// STUDENT = 0, TEACHER = 1, ADMIN = 2
+export type RoleCode = 0 | 1 | 2;
+
+export const ROLE_MAP: Record<RoleCode, Role> = {
+  0: "student",
+  1: "teacher",
+  2: "admin" as Role, // widen Role to include "admin" if you actually support admin in the UI
+};
 /** POST /accounts/login/ — request body */
 export interface LoginPayload {
   email: string;
@@ -13,7 +22,7 @@ export interface LoginResponse {
   message: string;
   email: string;
   full_name: string;
-  role: Role;
+  role: RoleCode;
   user_id: string;
   refresh: string;
   access: string;

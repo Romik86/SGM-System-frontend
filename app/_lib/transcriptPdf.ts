@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { ClassTranscript } from "@/app/_interfaces/transcript";
-
+import { getLetterGrade, getOverallPercentage } from "@/app/_lib/grading";
 export function downloadTranscriptPdf(transcript: ClassTranscript) {
     const doc = new jsPDF();
 
@@ -57,6 +57,12 @@ export function downloadTranscriptPdf(transcript: ClassTranscript) {
     // ===========================
     // Summary
     // ===========================
+    const overallPercentage = getOverallPercentage(
+        transcript.summary.total_obtained_marks,
+        transcript.summary.total_full_marks
+    );
+    const overallGrade = overallPercentage !== null ? getLetterGrade(overallPercentage) : "-";
+
     doc.setFont("helvetica", "bold");
     doc.text("Overall Result", 14, 127);
 
@@ -69,9 +75,21 @@ export function downloadTranscriptPdf(transcript: ClassTranscript) {
     );
 
     doc.text(
-        `Overall Status: ${transcript.summary.overall_status}`,
+        `Overall Percentage: ${overallPercentage !== null ? `${overallPercentage}%` : "-"}`,
         14,
         142
+    );
+
+    doc.text(
+        `Overall Grade: ${overallGrade}`,
+        14,
+        149
+    );
+
+    doc.text(
+        `Overall Status: ${transcript.summary.overall_status}`,
+        14,
+        156
     );
 
     // ===========================
@@ -111,7 +129,7 @@ export function downloadTranscriptPdf(transcript: ClassTranscript) {
     // Table
     // ===========================
     autoTable(doc, {
-        startY: 152,
+        startY: 166,
 
         head: [[
             "Code",
