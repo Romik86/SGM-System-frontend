@@ -19,6 +19,7 @@ import { register as registerUser } from "../_lib/auth";
 import { ApiError } from "../_lib/config";
 import { LoaderOverlay } from "../_components/ui/Miniloader";
 import { getFriendlyAuthError } from "../_lib/error-messages";
+
 export default function RegisterPage() {
   const router = useRouter();
   const [serverError, setServerError] = React.useState("");
@@ -39,8 +40,12 @@ export default function RegisterPage() {
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError("");
     try {
-      const { confirm_password, ...payload } = values;
-      await registerUser(payload);
+      const { confirm_password, role, ...rest } = values;
+      const payload = {
+        ...rest,
+        role: role === "teacher" ? 1 : 0,
+      };
+      await registerUser(payload as unknown as Parameters<typeof registerUser>[0]);
       router.push("/login?registered=1");
     } catch (err) {
       setServerError(getFriendlyAuthError(err, "register"));
