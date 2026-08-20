@@ -19,10 +19,13 @@ import { register as registerUser } from "../_lib/auth";
 import { ApiError } from "../_lib/config";
 import { LoaderOverlay } from "../_components/ui/Miniloader";
 import { getFriendlyAuthError } from "../_lib/error-messages";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [serverError, setServerError] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const {
     register,
@@ -45,7 +48,9 @@ export default function RegisterPage() {
         ...rest,
         role: role === "teacher" ? 1 : 0,
       };
-      await registerUser(payload as unknown as Parameters<typeof registerUser>[0]);
+      await registerUser(
+        payload as unknown as Parameters<typeof registerUser>[0],
+      );
       router.push("/login?registered=1");
     } catch (err) {
       setServerError(getFriendlyAuthError(err, "register"));
@@ -175,14 +180,24 @@ export default function RegisterPage() {
           htmlFor="password"
           error={errors.password?.message}
         >
-          <Input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="At least 8 characters"
-            error={!!errors.password}
-            {...register("password")}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder="At least 8 characters"
+              error={!!errors.password}
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--accent)]"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </Field>
 
         <Field
@@ -190,14 +205,24 @@ export default function RegisterPage() {
           htmlFor="confirm_password"
           error={errors.confirm_password?.message}
         >
-          <Input
-            id="confirm_password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Re-enter your password"
-            error={!!errors.confirm_password}
-            {...register("confirm_password")}
-          />
+          <div className="relative">
+            <Input
+              id="confirm_password"
+              type={showConfirmPassword ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder="Re-enter your password"
+              error={!!errors.confirm_password}
+              {...register("confirm_password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--accent)]"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </Field>
 
         <Button type="submit" loading={isSubmitting}>
